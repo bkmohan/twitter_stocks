@@ -1,3 +1,7 @@
 {
-  "alphavantage_apis": ["9WFZY1BOT60IVFBK"]
+  "tweepy_consumer_key": "iSaQ7guMk4kkgYIaUwA31zLZo",
+  "tweepy_consumer_secret": "CYMbWNYCJ35GwZIqxp0ccpirmZs7COyEQCImvyNRMLyQjr2WjH",
+  "alphavantage_apis": ["9WFZY1BOT60IVFBK"],
+  "twiiter_ids_input": "D:\\Scrappers\\Anurag\\Twitter\\code\\Twitter_Ids.csv",
+  "output_filename": "Tweets_Prices.csv"
 }
