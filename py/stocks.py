@@ -1,4 +1,4 @@
-import os, glob, datetime, requests, io, logging, time
+import os, glob, datetime, requests, io, logging, time, json
 import pandas as pd
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
@@ -65,7 +65,7 @@ class StocksData():
         saves all stocks dataframe downladed to (data_folder) folder
     """
 
-    def __init__(self, data_folder, API_List):
+    def __init__(self, data_folder, API_List, IEX_API):
         """
         Initiantes StocksData class with (data_folder) path for saving downloaded stock data and 
         (API_List) a list ot Alphavantage APIs
@@ -76,9 +76,11 @@ class StocksData():
             (data_folder) Folder path for saving downloaded files
         arg2 : list
             (APIs) List of Alphavantage APis
-               
+        arg3 : str:
+            IEXCloud Api for getting current price
         """
         self.data_folder = data_folder
+        self.IEX_API = IEX_API
         all_files = glob.glob(os.path.join(data_folder, "*.csv"))
         self.stocks_df = {}
 
@@ -112,14 +114,16 @@ class StocksData():
         df = self.__download_df(symbol)
         if df.empty:
             ''' Return NA if no stock found in Alphavnatage datbase'''
-            return 'NA', 'NA', 'NA', 'NA', 'NA'
+            return 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'
+
         alert_price = self.__get_price(df, dtime)
         two_hr_price = self.__get_price(df, dtime + datetime.timedelta(hours=2))
         four_hr_price = self.__get_price(df, dtime + datetime.timedelta(hours=4))
         one_d_price = self.__get_price(df, dtime + datetime.timedelta(days=1))
         one_w_price = self.__get_price(df, dtime + datetime.timedelta(days=7))
-        
-        return alert_price, two_hr_price, four_hr_price, one_d_price, one_w_price
+        current_price = self.__get_current_price(symbol)
+
+        return alert_price, two_hr_price, four_hr_price, one_d_price, one_w_price, current_price
         
 
     def save_data(self):
@@ -146,6 +150,25 @@ class StocksData():
         saveas = os.path.join(self.data_folder, f'{symbol}.csv')
         df.to_csv(saveas, index=False)
         logging.info(f"{symbol} data saved to {self.data_folder}")
+
+    def __get_current_price(self, symbol):
+        """
+        Method returns current price of the stock from IEXcloud server
+        
+        Parameters
+        ----------
+        arg1 : str
+            Stock's symbol
+
+        Return
+        ------
+            float
+                Current price of the stock (symbol)
+        """
+        url = f'https://cloud.iexapis.com/stable/stock/{symbol}/quote?token={self.IEX_API}'
+  
+        response = requests.get(url, timeout=30).json()
+        return response['iexClose']
 
     def __get_price(self, df, dtime):
         """
@@ -265,7 +288,8 @@ class StocksData():
 
 
 if __name__ == "__main__":
-    stk = StocksData('./data/stocks')
+    config = json.load(open(r'D:\Scrappers\Anurag\Twitter\code\config.json'))
+    stk = StocksData(r'D:\Scrappers\Anurag\Twitter\code/data/stocks', config['alphavantage_apis'], config['iexcloud_api'])
 
     sym = ['COHN', 'NETE', 'SNMP', 'UAMY', 'CARV', 'TIRX', 'PXS', 'ONE', 'CXDC']
     for s in sym:

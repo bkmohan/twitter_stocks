@@ -85,7 +85,7 @@ def write_csv(output, tweet_data, prices):
     arg2 : dict
         single tweet data
     arg3 : tuple
-        tuple of prices (Alert Price, 2hr, 4hr, 1D, 1W)
+        tuple of prices (Alert Price, 2hr, 4hr, 1D, 1W, Current Price)
     """
     row = {
                 'Username' : tweet_data['ID'],
@@ -97,9 +97,10 @@ def write_csv(output, tweet_data, prices):
                 '4hr' : prices[2],
                 '1D' : prices[3],
                 '1w' : prices[4], 
+                'Current Price' : prices[5],
                 'Tweet': tweet_data['Tweet']
             }
-    field_names = ['Username', 'Date', 'Time', 'CashTag', 'Alert Price', '2hr', '4hr', '1D', '1w', 'Tweet']
+    field_names = ['Username', 'Date', 'Time', 'CashTag', 'Alert Price', '2hr', '4hr', '1D', '1w', 'Current Price' ,'Tweet']
     with open(output, 'a', newline='', encoding='utf-8-sig') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames = field_names)
         writer.writerow(row)
@@ -108,14 +109,14 @@ def write_csv(output, tweet_data, prices):
 
 def create_csv(output):
     """
-    Creates new output csv file, with headers ('Username', 'Date', 'Time', 'CashTag', 'Alert Price', '2hr', '4hr', '1D', '1w', 'Tweet')
+    Creates new output csv file, with headers ('Username', 'Date', 'Time', 'CashTag', 'Alert Price', '2hr', '4hr', '1D', '1w', 'Current Price', 'Tweet')
     
     Parameters
     ----------
     arg1 : str
         output filename
     """
-    field_names = ['Username', 'Date', 'Time', 'CashTag', 'Alert Price', '2hr', '4hr', '1D', '1w', 'Tweet']
+    field_names = ['Username', 'Date', 'Time', 'CashTag', 'Alert Price', '2hr', '4hr', '1D', '1w', 'Current Price', 'Tweet']
     with open(output, 'w', newline='', encoding='utf-8-sig') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames = field_names)
         writer.writeheader()
@@ -197,7 +198,7 @@ if __name__ == '__main__':
     auth = tweepy.AppAuthHandler(consumer_key, consumer_secret)
     api = tweepy.API(auth)
 
-    stock_obj = StocksData('./data/stocks', config['alphavantage_apis'])
+    stock_obj = StocksData('./data/stocks', config['alphavantage_apis'], config['iexcloud_api'])
     crypto_obj = CryptosData('./data/cryptos')
     crypto_symbols = crypto_obj.get_cryptos()
 

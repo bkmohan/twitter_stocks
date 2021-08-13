@@ -51,18 +51,22 @@ class CryptosData():
         Returns
         -------
         tuple
-            Returns tuple of prices (Alert Price, 2hr, 4hr, 1D, 1W)
+            Returns tuple of prices (Alert Price, 2hr, 4hr, 1D, 1W, current price)
         """
         dtime = dtime.replace(second=0)
         df = self.__download_df(symbol)
+        if df.empty:
+            ''' Return NA if no stock found in Alphavnatage datbase'''
+            return 'NA', 'NA', 'NA', 'NA', 'NA', 'NA'
 
         alert_price = self.__get_price(df, dtime)
         two_hr_price = self.__get_price(df, dtime + datetime.timedelta(hours=2))
         four_hr_price = self.__get_price(df, dtime + datetime.timedelta(hours=4))
         one_d_price = self.__get_price(df, dtime + datetime.timedelta(days=1))
         one_w_price = self.__get_price(df, dtime + datetime.timedelta(days=7))
+        current_price = self.__get_current_price(symbol)
         
-        return alert_price, two_hr_price, four_hr_price, one_d_price, one_w_price
+        return alert_price, two_hr_price, four_hr_price, one_d_price, one_w_price, current_price
 
     def save_data(self):
         """
@@ -88,6 +92,32 @@ class CryptosData():
         saveas = os.path.join(self.data_folder, f'{symbol}.csv')
         df.to_csv(saveas, index=False)
         logging.info(f"{symbol} data saved to {self.data_folder}")
+
+    def __get_current_price(self, symbol):
+        """
+        Method returns current price of the stock from Coingecko server
+        
+        Parameters
+        ----------
+        arg1 : str
+            Stock's symbol
+
+        Return
+        ------
+            float
+                Current price of the crypto (symbol)
+        """
+        id = ''
+        for crypto in self.get_cryptos():
+            if crypto['symbol'].lower() == symbol.lower():
+                id = crypto['id']
+                break
+        try:
+            url = f"https://api.coingecko.com/api/v3/simple/price?ids={id}&vs_currencies=usd"
+            response = requests.get(url, timeout=30).json()
+            return response[id]['usd']
+        except:
+            return 'NA'
 
     def __get_price(self, df, dtime):
         """
@@ -141,7 +171,6 @@ class CryptosData():
         download = False
         if symbol in self.cryptos_df.keys():
             dfs = self.cryptos_df[symbol]
-            print(dfs)
             start_date = dfs['time'].iloc[0].to_pydatetime().date()
             today = datetime.date.today() - datetime.timedelta(days=1)
             if today > start_date:
@@ -225,7 +254,7 @@ class CryptosData():
         return self.all_cryptos
 
 if __name__ == "__main__":
-    stk = CryptosData('./data/cryptos')
+    stk = CryptosData('D:\Scrappers\Anurag\Twitter\code/data/cryptos')
 
     sym = ['btc', 'eth', 'cat', 'bcna', 'axn', 'klee', 'pgo', 'min']
     for s in sym:

@@ -1,7 +1,8 @@
 {
   "tweepy_consumer_key": "iSaQ7guMk4kkgYIaUwA31zLZo",
   "tweepy_consumer_secret": "CYMbWNYCJ35GwZIqxp0ccpirmZs7COyEQCImvyNRMLyQjr2WjH",
-  "alphavantage_apis": ["9WFZY1BOT60IVFBK"],
+  "alphavantage_apis": ["DCB4F4O4HG64XWI7", "9WFZY1BOT60IVFBK"],
+  "iexcloud_api": "pk_62bb89d1eb0849a4b4a682c37c6a05f0",
   "twiiter_ids_input": "D:\\Scrappers\\Anurag\\Twitter\\code\\Twitter_Ids.csv",
   "output_filename": "Tweets_Prices.csv"
 }
