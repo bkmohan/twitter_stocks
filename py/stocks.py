@@ -111,6 +111,7 @@ class StocksData():
             Returns tuple of prices (Alert Price, 2hr, 4hr, 1D, 1W)
         """
         dtime = dtime.replace(second=0)
+        symbol = symbol.upper()
         df = self.__download_df(symbol)
         if df.empty:
             ''' Return NA if no stock found in Alphavnatage datbase'''

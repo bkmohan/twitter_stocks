@@ -54,6 +54,7 @@ class CryptosData():
             Returns tuple of prices (Alert Price, 2hr, 4hr, 1D, 1W, current price)
         """
         dtime = dtime.replace(second=0)
+        symbol = symbol.upper()
         df = self.__download_df(symbol)
         if df.empty:
             ''' Return NA if no stock found in Alphavnatage datbase'''
@@ -169,6 +170,7 @@ class CryptosData():
             downloaded data as dataframe
         """
         download = False
+        
         if symbol in self.cryptos_df.keys():
             dfs = self.cryptos_df[symbol]
             start_date = dfs['time'].iloc[0].to_pydatetime().date()
@@ -224,10 +226,13 @@ class CryptosData():
                 try:
                     logging.info(f"Downloading data of crypto: {symbol}")
                     url = f'https://api.coingecko.com/api/v3/coins/{id}/market_chart?vs_currency=usd&days=30&interval=hourly'
+                    # print(url)
                     response = requests.get(url, timeout=60)
+                    time.sleep(1)
                     return response
                 except Exception as e:
                     logging.error(e)
+                logging.warning(f"No Response for {symbol}. Retrying {i+1}...")
                 time.sleep(5)
         
         
@@ -256,8 +261,8 @@ class CryptosData():
 if __name__ == "__main__":
     stk = CryptosData('D:\Scrappers\Anurag\Twitter\code/data/cryptos')
 
-    sym = ['btc', 'eth', 'cat', 'bcna', 'axn', 'klee', 'pgo', 'min']
+    sym = ['CHR', 'SPARTA', 'OLT', 'DOT', 'theta', 'vnla', 'pgo', 'min']
     for s in sym:
-        prices = stk.get_prices(s,datetime.datetime(2021, 8, 9, 13, 50, 33))
+        prices = stk.get_prices(s,datetime.datetime(2021, 8, 11, 13, 50, 33))
         print(s, prices)
     stk.save_data()
