@@ -65,11 +65,14 @@ def preffered_ticker(tweet_data, crypto_symbols):
         Preffered Ticker
     """
     check_symbols = set()
+    crypto_ids = []
+    for crypto in crypto_symbols:
+        crypto_ids.append(crypto['symbol'])
 
     preffer = 0
     for i in range(len(tweet_data)):
         if tweet_data[i]['Symbol'] not in check_symbols: check_symbols.add(tweet_data[i]['Symbol'])
-        if tweet_data[i]['Symbol'] in crypto_symbols:  preffer += 1
+        if tweet_data[i]['Symbol'] in crypto_ids:  preffer += 1
         if len(check_symbols) >= 10: break
 
     return 'Cryptos' if preffer >= 7 else 'Stocks' 
@@ -139,13 +142,13 @@ def get_prices(output, tweet_data, pref):
     if pref == 'Stocks':
         for d in tweet_data:
             prices = stock_obj.get_prices(d['Symbol'], d['Date'])
-            if prices == ('NA', 'NA', 'NA', 'NA', 'NA'):
+            if prices == ('NA', 'NA', 'NA', 'NA', 'NA', 'NA'):
                 prices = crypto_obj.get_prices(d['Symbol'], d['Date'])
             write_csv(output, d, prices)
     else:
         for d in tweet_data:
             prices = crypto_obj.get_prices(d['Symbol'], d['Date'])
-            if prices == ('NA', 'NA', 'NA', 'NA', 'NA'):
+            if prices == ('NA', 'NA', 'NA', 'NA', 'NA', 'NA'):
                 prices = stock_obj.get_prices(d['Symbol'], d['Date'])
             write_csv(output, d, prices)
         
